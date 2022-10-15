@@ -2,29 +2,42 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 
-public class SearchEngine {
+class Handler implements URLHandler{
     ArrayList<String> arr = new ArrayList<String>(10);
     ArrayList<String> alt = new ArrayList<String>(10);
-
-    public ArrayList<String> handleRequest(URI url) {
+    
+    public String handleRequest(URI url) {
+            if (url.getPath().equals("/")) {
+                return "This is search engine.";
+            }
             if (url.getPath().contains("/add")) {
                 String[] parameters = url.getQuery().split("=");
                 arr.add(parameters[1]);
-                return arr;
+                String empty = "";
+                for (String s: arr) {
+                    empty = empty + " " + s;
+                }
+                return empty;
             }
             else if (url.getPath().contains("/search")) {
                 String[] parameters = url.getQuery().split("=");
                 
                 for(int i = 0; i < arr.size(); i++) {
                     if (arr.get(i).contains(parameters[1])) {
-                        alt.add(parameters[1]);
-                        return alt;
+                        alt.add(arr.get(i));
                     }
                 }
+                String empty = "";
+                for (String s: alt) {
+                    empty = empty + " " + s;
+                }
+                return empty;
             }
-            return arr;
+        return "404 Not Found!";
     }
+}
 
+class SearchEngine {
     public static void main(String[] args) throws IOException {
         if(args.length == 0){
             System.out.println("Missing port number! Try any number between 1024 to 49151");
@@ -36,4 +49,3 @@ public class SearchEngine {
         Server.start(port, new Handler());
     }
 }
-
